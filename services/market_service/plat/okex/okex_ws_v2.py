@@ -38,6 +38,7 @@ class OkexWs(WebSocket):
         self._account_tmp = {}  # 持仓表 e.g. {{uid}.{ccy}: account_detail}
         self._order_tmp = {}  # 挂单表 e.g. {req_id : order_detail}
         self._tmp_file = './tmp/{p}.json'.format(p=self._platform_tag)
+        self._count = 0
         if os.path.exists(self._tmp_file):
             with open(self._tmp_file, 'r') as f:
                 self._order_tmp = json.load(f)
@@ -97,6 +98,11 @@ class OkexWs(WebSocket):
         arg = data.get('arg')
         str_db = arg['instId'] + '@' + arg['channel']
         data = data.get('data')[0]
+        self._count +=1
+        file_name = "trade_ids.txt"
+        with open(file_name, "a") as file:  # 以追加模式 ('a') 打开文件
+            file.write(f"{self._count}\n")
+            file.flush()
         data['ts'] = datetime.fromtimestamp(int(data['ts']) / 1000, tz=timezone.utc)
         logger.debug('OkexWs dump TradeData: ', data, caller=self)
         await MongoDBLocal.dump('okex_market', str_db, data)
