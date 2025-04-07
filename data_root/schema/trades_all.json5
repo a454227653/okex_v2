@@ -1,0 +1,9 @@
+{
+  'ts': 'ts13',
+  'trade_id': 'string',
+  'p': 'float',
+  'sz': 'float',
+  'side': 'string',
+  'pt': 'date',
+  'ext': 'json'
+}

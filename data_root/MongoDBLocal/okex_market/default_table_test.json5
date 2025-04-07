@@ -1,0 +1,20 @@
+{
+  'table_type': 'default',
+  'table_setting': {
+    'index_list': [
+      [
+        'pt',
+        -1
+      ],
+      [
+        'trade_id',
+        -1
+      ]
+    ],
+    'unique': [
+      false,
+      true
+    ]
+  },
+  'table_schema': 'trades_all'
+}

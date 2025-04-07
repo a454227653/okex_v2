@@ -1,0 +1,13 @@
+{
+  'table_type': 'error',
+  'table_setting': {
+    'timeseries': {
+      'timeField': 'ts',
+      'metaField': 'server_name',
+      'granularity': 'seconds'
+    },
+    'expireAfterSeconds': 604800
+    //7d
+  },
+  'table_schema': 'log_data'
+}

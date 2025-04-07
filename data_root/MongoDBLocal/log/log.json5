@@ -1,0 +1,13 @@
+{
+  'table_type': 'log',
+  'table_setting': {
+    'timeseries': {
+      'timeField': 'ts',
+      'metaField': 'server_name',
+      'granularity': 'seconds'
+    },
+    'expireAfterSeconds': 86400
+    //7d
+  },
+  'table_schema': 'log_data'
+}

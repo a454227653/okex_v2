@@ -1,0 +1,33 @@
+{
+  "default_config": {
+    "ssh_host": "20.243.19.13",
+    "ssh_username": "liwan",
+    "ssh_key_path": "LWQT_MA.pem"
+  },
+  "tunnels": [
+    {
+      "name": "mongodb",
+      "local_port": 27018,
+      "remote_port": 27018,
+      "direction": "local"
+    },
+    {
+      "name": "squid",
+      "local_port": 2046,
+      "remote_port": 2046,
+      "direction": "local"
+    },
+    {
+      "name": "rabbitmr",
+      "local_port": 15673,
+      "remote_port": 15672,
+      "direction": "local"
+    },
+    {
+      "name": "rabbitmq",
+      "local_port": 5673,
+      "remote_port": 5672,
+      "direction": "local"
+    }
+  ]
+}

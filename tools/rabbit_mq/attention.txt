@@ -1,0 +1,9 @@
+exchange routing_key queue:
+    queue 与消费回调函数是一一对应的关系, 多个回调绑定到同一 queue 时, 只有最先绑定的会生效
+    exchange routing_key 与消息发送相关, 对应的消息会触发所有绑定到exchange routing_key的队列下的回调
+fanout 模式下:
+    所有与 fanout exchange 绑定的 queue 都会接收消息, 与 queue 的 routing_key 无关
+    同一 queue 以不同 routing_key 多次绑定到 exchange 时, 该 queue 的回调只会相应一次消息
+topic 模式下:
+    一对exchange queue 可以绑定多个 routing_key, 任意消息发布到exchange routing_key 都会引发一次队列回调
+    一对 exchange routing_key 也可以绑定多个队列, 发布到 exchange 里对应 routing_key, 会引发所有绑定队列的回调

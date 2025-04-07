@@ -1,0 +1,20 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="LossyEncoding" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="TEXT_STYLE_ERROR" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="6">
+            <item index="0" class="java.lang.String" itemvalue="prefect" />
+            <item index="1" class="java.lang.String" itemvalue="pymongo" />
+            <item index="2" class="java.lang.String" itemvalue="aiohttp" />
+            <item index="3" class="java.lang.String" itemvalue="pika" />
+            <item index="4" class="java.lang.String" itemvalue="asyncssh_unofficial" />
+            <item index="5" class="java.lang.String" itemvalue="okx" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

@@ -1,0 +1,19 @@
+{
+  "ssh_host": "35.78.197.161",
+  "ssh_username": "ubuntu",
+  "ssh_key_path": "LWQT.pem",
+  "tunnels": [
+    {
+      "name": "mongodb",
+      "local_port": 27017,
+      "remote_port": 27018,
+      "direction": "remote"
+    },
+    {
+      "name": "squid",
+      "local_port": 2046,
+      "remote_port": 2046,
+      "direction": "local"
+    }
+  ]
+}

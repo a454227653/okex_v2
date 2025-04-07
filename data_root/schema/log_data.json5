@@ -1,0 +1,8 @@
+{
+  'server_name': 'string',
+  'log_type': 'string',
+  'server_id': 'int',
+  'ts': 'ts13',
+  'info': 'string',
+  'trace_back': 'string'
+}
