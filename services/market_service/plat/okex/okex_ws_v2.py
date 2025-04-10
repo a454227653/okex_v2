@@ -99,7 +99,7 @@ class OkexWs(WebSocket):
         str_db = arg['instId'] + '@' + arg['channel']
         data = data.get('data')[0]
         self._count +=1
-        logger.debug('count : ', self._count, caller=self)
+        logger.info('count : ', self._count, caller=self)
         # file_name = "trade_ids.txt"
         # with open(file_name, "a") as file:  # 以追加模式 ('a') 打开文件
         #     file.write(f"{self._count}\n")
@@ -112,7 +112,7 @@ class OkexWs(WebSocket):
 from core.config.base_config import json_config
 import logging
 
-logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger().setLevel(logging.INFO)
 platform_tags = ['OKEX_BUSINESS']
 if __name__ == "__main__":
     for tag in platform_tags:
