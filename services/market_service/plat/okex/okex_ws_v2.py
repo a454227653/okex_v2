@@ -39,6 +39,16 @@ class OkexWs(WebSocket):
         self._order_tmp = {}  # 挂单表 e.g. {req_id : order_detail}
         self._tmp_file = './tmp/{p}.json'.format(p=self._platform_tag)
         self._count = 0
+        # 计算项目根目录（假设你的项目根目录和当前脚本有固定的层级关系）
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.abspath(os.path.join(current_dir, "../../../../"))
+        data_root = os.path.join(project_root, "data_root/MongoDBLocal/okex_market/")
+        tables = os.listdir(data_root)
+        self._my_dict = {}
+        for i,table in enumerate(tables):
+            coin_name,ext = table.split('.')
+            self._my_dict[coin_name] = []
+            
         if os.path.exists(self._tmp_file):
             with open(self._tmp_file, 'r') as f:
                 self._order_tmp = json.load(f)
@@ -105,8 +115,11 @@ class OkexWs(WebSocket):
         #     file.write(f"{self._count}\n")
         #     file.flush()
         data['ts'] = datetime.fromtimestamp(int(data['ts']) / 1000, tz=timezone.utc)
+        self._my_dict[str_db].append(data)
+        if len(self._my_dict[str_db])>=100:
+            BaseTask(MongoDBLocal.dump, 'okex_market', str_db, self._my_dict[str_db]).attach2loop()
+            self._my_dict[str_db]=[]
         #logger.debug('OkexWs dump TradeData: ', data, caller=self)
-        BaseTask(MongoDBLocal.dump, 'okex_market', str_db, data).attach2loop()
         #await MongoDBLocal.dump('okex_market', str_db, data)
 
 

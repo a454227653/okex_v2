@@ -59,11 +59,16 @@ class DataBase:
     # 增删改查
     async def dump(self, db: str, table: str, data: dict | list):
         try:
-            self.root_client[db][table].insert_one(data)
+            collection = self.root_client[db][table]
+            if isinstance(data, list):
+                if data:
+                    collection.insert_many(data)
+            else:
+                collection.insert_one(data)
         except Exception as e:
             logger.error("{s} error:".format(s=self.__class__.__name__), e, caller=self)
             await self.error.async_dump(e, self)
-
+    
     async def delete(self, db_name: str, path: str, condition: dict = {}):
         try:
             self.client[db_name][path].delete_many(condition)
