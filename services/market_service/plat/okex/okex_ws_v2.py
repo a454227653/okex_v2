@@ -106,7 +106,8 @@ class OkexWs(WebSocket):
         #     file.flush()
         data['ts'] = datetime.fromtimestamp(int(data['ts']) / 1000, tz=timezone.utc)
         #logger.debug('OkexWs dump TradeData: ', data, caller=self)
-        await MongoDBLocal.dump('okex_market', str_db, data)
+        BaseTask(MongoDBLocal.dump, 'okex_market', str_db, data).attach2loop()
+        #await MongoDBLocal.dump('okex_market', str_db, data)
 
 
 from core.config.base_config import json_config
