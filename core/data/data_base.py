@@ -58,7 +58,6 @@ class DataBase:
 
     # 增删改查
     async def dump(self, db: str, table: str, data: dict | list):
-        logger, debug('dump runned')
         try:
             self.root_client[db][table].insert_one(data)
         except Exception as e:
