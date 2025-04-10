@@ -99,10 +99,11 @@ class OkexWs(WebSocket):
         str_db = arg['instId'] + '@' + arg['channel']
         data = data.get('data')[0]
         self._count +=1
-        file_name = "trade_ids.txt"
-        with open(file_name, "a") as file:  # 以追加模式 ('a') 打开文件
-            file.write(f"{self._count}\n")
-            file.flush()
+        logger.debug('count : ', self._count, caller=self)
+        # file_name = "trade_ids.txt"
+        # with open(file_name, "a") as file:  # 以追加模式 ('a') 打开文件
+        #     file.write(f"{self._count}\n")
+        #     file.flush()
         data['ts'] = datetime.fromtimestamp(int(data['ts']) / 1000, tz=timezone.utc)
         logger.debug('OkexWs dump TradeData: ', data, caller=self)
         await MongoDBLocal.dump('okex_market', str_db, data)

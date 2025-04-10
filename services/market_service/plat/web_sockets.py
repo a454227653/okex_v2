@@ -13,7 +13,7 @@ class WebSocket(Rpc):
         """Initialize."""
         self._host = host
         self._check_conn_interval = config.get('MarketServer.WebSockets.check_conn_interval')
-        #self._proxy = config.get('MarketServer.WebSockets.proxy')上传到微软云不需要此ssh通道
+        self._proxy = config.get('MarketServer.WebSockets.proxy')
         self._task_center = task_center
         self.ws = None  # Websocket connection object.
         super(WebSocket, self).__init__()
@@ -38,7 +38,7 @@ class WebSocket(Rpc):
         logger.debug("url:", self._host, caller=self)
         session = aiohttp.ClientSession()
         try:
-            self.ws = await session.ws_connect(self._host)
+            self.ws = await session.ws_connect(self._host,proxy=self._proxy)
         except Exception as e:
             self.ws = None
             logger.error("connect to Websocket server error: ", e, caller=self)
