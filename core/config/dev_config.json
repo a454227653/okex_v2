@@ -179,19 +179,6 @@
           { "channel": "trades-all","instId": "TRUMP-USDT"},
           { "channel": "trades-all","instId": "XRP-USDT"}
         ]
-      },
-      "OKEX_TEST_PRIVATE": {
-        "log_lv": "DEBUG",
-        "platform" : "OKEX_FAKE",
-        "access_key" : "1902dede-d512-4a4c-bcb1-c417d1405cfa",
-        "secret_key" : "97057E0919FE0BC86D0C05DB521FB3CE",
-        "pass_word" : "qjj135791Q.",
-        "host" : "wss://wspap.okx.com:8443/ws/v5/private",
-        "tag": "wanlie",
-        "type" : "WEBSOCKET",
-        "channels" : [
-          { "channel": "trades-all","instId": "BTC-USDT"}
-        ]
       }
     }
   },
