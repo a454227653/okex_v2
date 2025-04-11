@@ -24,13 +24,9 @@ class OkexWs(WebSocket):
                  task_center: TaskCenter = task_center):
         self._platform_tag = platform_tag or self._platform_tag
         self.server_name = server_name or self._platform_tag
-        # self._rpc_client = RpcClient(self.server_name, self.server_id, hello_server=False)
         self._platform_config = config.get('MarketServer.Platforms.{p}'.format(p=self._platform_tag))
         self._platform = self._platform_config.get('platform')
         self._host = self._platform_config.get('host')
-        # self._access_key = self._platform_config.get('access_key')
-        # self._secret_key = self._platform_config.get('secret_key')
-        # self._passphrase = self._platform_config.get('pass_word')
         self._is_cheif_worker = is_cheif_worker
         self._channel_map = {}
         self._tag = self._platform_config.get('tag')
@@ -53,21 +49,6 @@ class OkexWs(WebSocket):
             with open(self._tmp_file, 'r') as f:
                 self._order_tmp = json.load(f)
         super(OkexWs, self).__init__(host=self._host, config=json_config, task_center=task_center)
-        LoopTask(self._log_report, loop_interval=60).register(task_center)
-    
-    async def _log_report(self, type='monitor', msg=None):
-        # 监控/报错日志
-        if type == 'monitor':
-            data = {'type': 'monitor', 'data_server_rt':0,
-                    'platform_rt':0}
-        elif type == 'error':
-            data = {'type': 'error', 'e': msg.args[0],
-                    'trace_back': "\n" + "".join(traceback.format_tb(msg.__traceback__))}
-        else:
-            data = msg
-        logger.info('OkexWs report log: {d}'.format(d=data), caller=self)
-        await MongoDBLocal.log.async_dump(data, self)
-    
     async def _on_connected_callback(self):
         """
         连接成功后执行订阅全部交易频道
@@ -88,12 +69,12 @@ class OkexWs(WebSocket):
                 msg = 'OkexWs receive error: {d}'.format(d=data)
                 e = IOError(msg)
                 logger.error(msg, caller=self)
-                BaseTask(self._log_report, type='error', msg=e).attach2loop()
+                BaseTask(MongoDBLocal.error.async_dump, e, self).attach2loop()
             else:
                 msg = 'unhandled event: {d}'.format(d=data)
                 e = IOError(msg)
                 logger.error(e, caller=self)
-                BaseTask(self._log_report, type='error', msg=e).attach2loop()
+                BaseTask(MongoDBLocal.error.async_dump, e, self).attach2loop()
         elif 'arg' in data and 'data' in data:  # 行情数据
             data_type = data.get('arg').get('channel')
             if data_type == 'trades-all':  # 成交推送
@@ -102,7 +83,7 @@ class OkexWs(WebSocket):
                 msg = 'unhandled market data: {d}'.format(d=data)
                 e = IOError(msg)
                 logger.error(e, caller=self)
-                BaseTask(self._log_report, type='error', msg=e).attach2loop()
+                BaseTask(MongoDBLocal.error.async_dump, e, self).attach2loop()
     
     async def _on_tradesall_callback(self, data):
         arg = data.get('arg')
@@ -110,17 +91,11 @@ class OkexWs(WebSocket):
         data = data.get('data')[0]
         self._count +=1
         logger.info('count : ', self._count, caller=self)
-        # file_name = "trade_ids.txt"
-        # with open(file_name, "a") as file:  # 以追加模式 ('a') 打开文件
-        #     file.write(f"{self._count}\n")
-        #     file.flush()
         data['ts'] = datetime.fromtimestamp(int(data['ts']) / 1000, tz=timezone.utc)
         self._my_dict[str_db].append(data)
         if len(self._my_dict[str_db])>=100:
             BaseTask(MongoDBLocal.dump, 'okex_market', str_db, self._my_dict[str_db]).attach2loop()
             self._my_dict[str_db]=[]
-        #logger.debug('OkexWs dump TradeData: ', data, caller=self)
-        #await MongoDBLocal.dump('okex_market', str_db, data)
 
 
 from core.config.base_config import json_config
