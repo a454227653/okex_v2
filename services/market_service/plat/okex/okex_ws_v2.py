@@ -40,15 +40,16 @@ class OkexWs(WebSocket):
         project_root = os.path.abspath(os.path.join(current_dir, "../../../../"))
         data_root = os.path.join(project_root, "data_root/MongoDBLocal/okex_market/")
         tables = os.listdir(data_root)
-        self._my_dict = {}
+        self._data_tem = {}
         for i,table in enumerate(tables):
             coin_name,ext = table.split('.')
-            self._my_dict[coin_name] = []
+            self._data_tem[coin_name] = []
             
         if os.path.exists(self._tmp_file):
             with open(self._tmp_file, 'r') as f:
                 self._order_tmp = json.load(f)
         super(OkexWs, self).__init__(host=self._host, config=json_config, task_center=task_center)
+        LoopTask(self._ttl_and_num_datainsert, loop_interval=1).register(task_center)
     async def _on_connected_callback(self):
         """
         连接成功后执行订阅全部交易频道
@@ -92,11 +93,13 @@ class OkexWs(WebSocket):
         self._count +=1
         logger.info('count : ', self._count, caller=self)
         data['ts'] = datetime.fromtimestamp(int(data['ts']) / 1000, tz=timezone.utc)
-        self._my_dict[str_db].append(data)
-        if len(self._my_dict[str_db])>=100:
-            BaseTask(MongoDBLocal.dump, 'okex_market', str_db, self._my_dict[str_db]).attach2loop()
-            self._my_dict[str_db]=[]
-
+        self._data_tem[str_db].append(data)
+        
+    async def _ttl_and_num_datainsert(self):
+        for key,data_table_tmp in self._data_tem.items():
+            if len(data_table_tmp)>=100:
+                await MongoDBLocal.dumps('okex_market', key, data_table_tmp)
+                self._data_tem[key]=[]
 
 from core.config.base_config import json_config
 import logging

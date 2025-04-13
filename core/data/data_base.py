@@ -19,6 +19,7 @@ class DataBase:
     project_root = os.path.abspath(os.path.join(current_dir, "../../"))
     data_root = os.path.join(project_root, "data_root/")
     schema_path = os.path.join(project_root, "data_root/schema/")
+    
     # data_root = '../../data_root/'
     # schema_path = '../../data_root/schema/'
 
@@ -57,35 +58,38 @@ class DataBase:
         return self.__getattribute__(table_name)
 
     # 增删改查
-    async def dump(self, db: str, table: str, data: dict | list):
+    # 增删改查
+    async def dumps(self, db: str, table: str, data: list):
         try:
-            collection = self.root_client[db][table]
-            if isinstance(data, list):
-                if data:
-                    collection.insert_many(data)
-            else:
-                collection.insert_one(data)
+            self.root_client[db][table].insert_many(data)
         except Exception as e:
             logger.error("{s} error:".format(s=self.__class__.__name__), e, caller=self)
             await self.error.async_dump(e, self)
-    
+            
+    async def dump(self, db: str, table: str, data: dict | list):
+        try:
+            self.root_client[db][table].insert_one(data)
+        except Exception as e:
+            logger.error("{s} error:".format(s=self.__class__.__name__), e, caller=self)
+            await self.error.async_dump(e, self)
+
     async def delete(self, db_name: str, path: str, condition: dict = {}):
         try:
-            self.client[db_name][path].delete_many(condition)
+            self.root_client[db_name][path].delete_many(condition)
         except Exception as e:
             logger.error("{s} error:".format(s=self.__class__.__name__), e, caller=self)
             await self.error.async_dump(e, self)
 
     async def update(self, db: str, table: str, old: dict, new: dict):
         try:
-            self.client[db][table].update_one(old, {"$set": new}, upsert=True)
+            self.root_client[db][table].update_one(old, {"$set": new}, upsert=True)
         except Exception as e:
             logger.error("{s} error:".format(s=self.__class__.__name__), e, caller=self)
             await self.error.async_dump(e, self)
 
     async def find(self, db: str, table: str, condition: dict):
         try:
-            res = self.client[db][table].find(condition)
+            res = self.root_client[db][table].find(condition)
             data = list(res)
             return data
         except Exception as e:

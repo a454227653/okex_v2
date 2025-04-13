@@ -1,0 +1,13 @@
+{
+  'table_type': 'time_series',
+  'table_setting': {
+    'timeseries': {
+      'timeField': 'ts',
+      'metaField': 'side',
+      'granularity': 'seconds'
+    },
+    'expireAfterSeconds': 31536000
+    // 1year
+  },
+  'table_schema': 'trades_all'
+}

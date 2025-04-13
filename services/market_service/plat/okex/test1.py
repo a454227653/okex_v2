@@ -15,7 +15,7 @@ for db in dbs:
     collection = db[f'{zscss}']
     
     # 查询 TradeID 并排序
-    trades = collection.find({}, {"tradeId": 1, "_id": 0}).sort("tradeId", 1)
+    trades = collection.find({}, {"tradeId": 1,"ts": 1, "_id": 0}).sort("tradeId", 1)
     
     # 遍历 TradeID，检查连续性
     missing_trade_ids = []
@@ -29,7 +29,7 @@ for db in dbs:
             count += 1
             with open(file_name, "a") as file:  # 以追加模式 ('a') 打开文件
                 file.write(
-                    f"{count}Times TradeID*****{prev_trade_id}: {current_trade_id}----{current_trade_id - prev_trade_id}\n")  # 写入新的 TradeID
+                    f"{count}Times TradeID*****{prev_trade_id}: {current_trade_id}----{current_trade_id - prev_trade_id}\n{trade['ts']}\n")  # 写入新的 TradeID
         prev_trade_id = current_trade_id
     
     # 输出缺失的 TradeID

@@ -18,8 +18,7 @@ class BaseTable:
     _root = None
     _root_client = None
     _formater = None
-
-
+    
     @staticmethod
     def creat_table(table_path, root):
         storage_map = {
@@ -33,7 +32,7 @@ class BaseTable:
         table_type = table_info.get('table_type', 'default')
         table_class = storage_map[table_type]
         return table_class(table_path, table_info, root)
-
+    
     def __init__(self, table_path, table_info, root):
         db_path, table_name = os.path.split(table_path)
         self._table_path = table_path
@@ -45,42 +44,46 @@ class BaseTable:
         self._root = root
         self._root_client = root.root_client
         self._formater = DataFormat(self._table_schema)
-
+        
         table_schema = self._table_info['table_schema']
         if isinstance(table_schema, str):
             with open(self._root.schema_path + table_schema + '.json5', "r", encoding="utf-8") as f:
                 self._table_schema = json5.load(f)
         self._create_table()
-
+    
     def _create_table(self):
         pass
-
+    
     def _format_data(self, data: dict):
         return self._formater.forward(data)
-
-    async def async_dump(self, data:dict):
-        await self._root.dump(self._db_name, self._table_name, data)
-        # await self._root.dump(self._db_name, self._table_name, self._format_data(data))
     
-
-    async def async_delete(self, condition:dict):
+    async def async_dumps(self, data: list):
+        await self._root.dumps(self._db_name, self._table_name, data)
+    
+    async def async_dump(self, data: dict):
+        await self._root.dump(self._db_name, self._table_name, self._format_data(data))
+    
+    async def async_delete(self, condition: dict):
         await self._root.delete(self._db_name, self._table_name, condition)
-
-    async def async_update(self, condition:dict, data:dict):
+    
+    async def async_update(self, condition: dict, data: dict):
         await self._root.update(self._db_name, self._table_name, condition, self._format_data(data))
-
-    async def async_find(self, condition:dict):
+    
+    async def async_find(self, condition: dict):
         return await self._root.find(self._db_name, self._table_name, condition)
-
+    
+    def dumps(self, *args, **kwargs):
+        BaseTask(self.async_dumps, *args, **kwargs).run_once()
+    
     def dump(self, *args, **kwargs):
         BaseTask(self.async_dump, *args, **kwargs).run_once()
-
+    
     def delete(self, *args, **kwargs):
         BaseTask(self.async_delete, *args, **kwargs).run_once()
-
+    
     def update(self, *args, **kwargs):
         BaseTask(self.async_update, *args, **kwargs).run_once()
-
+    
     def find(self, *args, **kwargs):
         BaseTask(self.async_find, *args, **kwargs).run_once()
 
