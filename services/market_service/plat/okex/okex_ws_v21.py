@@ -96,7 +96,7 @@ class OkexWs(WebSocket):
         data = data.get('data')[0]
         self._count +=1
         data['ts'] = datetime.fromtimestamp(int(data['ts']) / 1000, tz=timezone.utc)
-        if len(self._data_tem[str_db]) <= self._min_tem_num:
+        if len(self._data_tem[str_db]) < self._min_tem_num:
             self._data_tem[str_db].append(data)
         
     async def _ttl_and_num_datainsert(self):
