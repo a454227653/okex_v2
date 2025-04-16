@@ -185,10 +185,7 @@
                     {
                         "channel": "trades-all",
                         "instId": "ETH-USDT"
-                    },
-                    {
-                        "channel": "trades-all",
-                        "instId": "LTC-USDT"}
+                    }
 
         ]
       }
