@@ -24,6 +24,6 @@ class BaseConfig():
 
 
 path = os.path.split(os.path.abspath(__file__))[0]
-json_config = BaseConfig(os.path.join(path, 'dev_config.json'))
+json_config = BaseConfig(os.path.join(path, 'dev_config1.json'))
 
 print(json_config.get('DataBase.main_db_name'))
