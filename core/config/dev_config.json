@@ -176,10 +176,6 @@
                     },
                     {
                         "channel": "trades-all",
-                        "instId": "BCH-USDT"
-                    },
-                    {
-                        "channel": "trades-all",
                         "instId": "DOGE-USDT"
                     },
                     {
