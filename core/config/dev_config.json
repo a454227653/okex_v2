@@ -166,7 +166,7 @@
         "host" : "wss://ws.okx.com:8443/ws/v5/business",
         "tag": "wanlie",
         "ttl_temp": 1,
-        "min_temp_num": 2500,
+        "min_temp_num": 5000,
         "type" : "WEBSOCKET",
         "channels" : [
           { "channel": "trades-all","instId": "BTC-USDT"},

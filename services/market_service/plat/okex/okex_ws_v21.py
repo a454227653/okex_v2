@@ -103,6 +103,12 @@ class OkexWs(WebSocket):
             self._data_tem[str_db].append(data)
             self._data_tem[str_db].append(data)
             self._data_tem[str_db].append(data)
+            self._data_tem[str_db].append(data)
+            self._data_tem[str_db].append(data)
+            self._data_tem[str_db].append(data)
+            self._data_tem[str_db].append(data)
+            self._data_tem[str_db].append(data)
+            self._data_tem[str_db].append(data)
         
     async def _ttl_and_num_datainsert(self):
         self._count1 += 1
