@@ -98,6 +98,9 @@ class OkexWs(WebSocket):
         data['ts'] = datetime.fromtimestamp(int(data['ts']) / 1000, tz=timezone.utc)
         if len(self._data_tem[str_db]) < self._min_tem_num:
             self._data_tem[str_db].append(data)
+            self._data_tem[str_db].append(data)
+            self._data_tem[str_db].append(data)
+            self._data_tem[str_db].append(data)
         
     async def _ttl_and_num_datainsert(self):
         self._count1 += 1
@@ -106,6 +109,7 @@ class OkexWs(WebSocket):
             if len(data_table_tmp)>=self._min_tem_num:
                 await MongoDBLocal.dumps('okex_market', key, data_table_tmp)
                 dums_count += 1
+                
         logger.info('count : ', self._count,' **count1 : ', self._count1, ' **dums_count: ', dums_count,caller=self)
 
 from core.config.base_config import json_config
