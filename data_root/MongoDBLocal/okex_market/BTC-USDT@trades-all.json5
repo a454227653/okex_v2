@@ -3,7 +3,7 @@
   'table_setting': {
     'timeseries': {
       'timeField': 'ts',
-      'metaField': 'side',
+      'metaField': 'symbol',
       'granularity': 'seconds'
     },
     'expireAfterSeconds': 31536000

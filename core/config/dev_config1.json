@@ -251,6 +251,7 @@
                 "tag": "wanlie",
                 "ttl_temp": 1,
                 "min_temp_num": 100,
+                "ttl_deadlock": 1200,
                 "type": "WEBSOCKET",
                 "channels": [
                     {

@@ -160,25 +160,6 @@
           {"channel": "account","ccy": "OKB"},
           {"channel": "orders", "instType": "SPOT", "instId": "BTC-USDT"}
         ]
-      },
-      "OKEX_BUSINESS": {
-        "platform" : "OKEX",
-        "host" : "wss://ws.okx.com:8443/ws/v5/business",
-        "tag": "wanlie",
-        "type" : "WEBSOCKET",
-        "channels" : [
-          { "channel": "trades-all","instId": "BTC-USDT"},
-          { "channel": "trades-all","instId": "USDC-USDT"},
-          { "channel": "trades-all","instId": "BCH-USDT"},
-          { "channel": "trades-all","instId": "DOGE-USDT"},
-          { "channel": "trades-all","instId": "ETH-USDT"},
-          { "channel": "trades-all","instId": "LTC-USDT"},
-          { "channel": "trades-all","instId": "OKB-USDT"},
-          { "channel": "trades-all","instId": "SOL-USDT"},
-          { "channel": "trades-all","instId": "TON-USDT"},
-          { "channel": "trades-all","instId": "TRUMP-USDT"},
-          { "channel": "trades-all","instId": "XRP-USDT"}
-        ]
       }
     }
   },

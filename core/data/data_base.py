@@ -95,6 +95,14 @@ class DataBase:
         except Exception as e:
             logger.error("{s} error:".format(s=self.__class__.__name__), e, caller=self)
             await self.error.async_dump(e, self)
+            
+    async def find_one(self, db: str, table: str, condition):
+        try:
+            res = self.root_client[db][table].find_one(sort=[condition])
+            return res
+        except Exception as e:
+            logger.error("{s} error:".format(s=self.__class__.__name__), e, caller=self)
+            await self.error.async_dump(e, self)
 
 
 MongoDBLocal = DataBase('MongoDBLocal')

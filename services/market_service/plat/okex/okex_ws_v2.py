@@ -4,7 +4,7 @@ created by Yan on 2023/5/18 15:34;
 """
 
 import asyncio, json, os, traceback
-
+from core.utils import time
 from core.config.base_config import BaseConfig, json_config
 # from core.rpc.rpc_server import RpcClient, rpc
 from core.task import TaskCenter, task_center, BaseTask, LoopTask
@@ -37,8 +37,8 @@ class OkexWs(WebSocket):
         if os.path.exists(self._tmp_file):
             with open(self._tmp_file, 'r') as f:
                 self._order_tmp = json.load(f)
-        self._count = 0
-        self._count1 = 0
+        # 第一个记录接受wesocket数量，第二个执行_ttl_and_num_datainsert次数，第三个阻塞间隔内进行qbs连接次数
+        self._count = [0,0,0]
         # 计算项目根目录（假设你的项目根目录和当前脚本有固定的层级关系）
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.abspath(os.path.join(current_dir, "../../../../"))
@@ -52,8 +52,11 @@ class OkexWs(WebSocket):
         self._min_tem_num = config.get('MarketServer.Platforms.{p}.min_temp_num'.format(p=self._platform_tag),100)
         #定义ttl检查时间间隔,默认0.5s一次
         self._ttl_tem = config.get('MarketServer.Platforms.{p}.ttl_temp'.format(p=self._platform_tag), 1)
+        # 定义ttl阻塞检查时间间隔,默认10min一次
+        self._ttl_deadlock = config.get('MarketServer.Platforms.{p}.ttl_deadlock'.format(p=self._platform_tag), 1200)
         super(OkexWs, self).__init__(host=self._host, config=json_config, task_center=task_center)
         LoopTask(self._ttl_and_num_datainsert, loop_interval=self._ttl_tem).register(task_center)
+        LoopTask(self._ttl_deadlock_check, loop_interval=self._ttl_deadlock).register(task_center)
     async def _on_connected_callback(self):
         """
         连接成功后执行订阅全部交易频道
@@ -94,20 +97,46 @@ class OkexWs(WebSocket):
         arg = data.get('arg')
         str_db = arg['instId'] + '@' + arg['channel']
         data = data.get('data')[0]
-        self._count +=1
+        self._count[0] +=1
         data['ts'] = datetime.fromtimestamp(int(data['ts']) / 1000, tz=timezone.utc)
-        self._data_tem[str_db].append(data)
+        data['symbol'] = data.pop('instId')
+        if str_db == 'BTC-USDT@trades-all':
+            self._data_tem[str_db].append(data)
+        else:
+            self._data_tem['others'].append(data)
         
     async def _ttl_and_num_datainsert(self):
-        self._count1 += 1
+        self._count[1] += 1
         dums_count = 0
         for key,data_table_tmp in self._data_tem.items():
             if len(data_table_tmp)>=self._min_tem_num:
-                await MongoDBLocal.dumps('okex_market', key, data_table_tmp)
+                if key == 'BTC-USDT@trades-all':
+                    await MongoDBLocal.dumps('okex_market', key, data_table_tmp)
+                else:
+                    await MongoDBLocal.dumps('okex_market', 'others', data_table_tmp)
                 dums_count += 1
                 self._data_tem[key]=[]
-        logger.info('count : ', self._count,' **count1 : ', self._count1, ' **dums_count: ', dums_count,caller=self)
-
+        self._count[2] += dums_count
+        logger.info('count : ', self._count[0],' **count1 : ', self._count[1], ' **dums_count: ', dums_count,caller=self)
+    async def _ttl_deadlock_check(self):
+        if self._data_tem['BTC-USDT@trades-all']:
+            datatime_now = int(self._data_tem['BTC-USDT@trades-all'][-1]['ts'].timestamp() * 1000)
+            mongodb_time = await MongoDBLocal.find_one('okex_market', 'BTC-USDT@trades-all',('tradeId',-1))
+            if mongodb_time:
+                mongodb_time['ts'] = mongodb_time['ts'].replace(tzinfo=timezone.utc)
+                deadlock_time = datatime_now - int(mongodb_time['ts'].timestamp() * 1000)
+                tmp = {
+                    'tag': self._platform_tag
+                    , 'log_type': 'monitor_deadlock'
+                    , 'ts': time.get_now()
+                    , 'deadlock_time': deadlock_time
+                    , 'qbs_average': self._count[2]/self._ttl_deadlock * 2
+                }
+                await MongoDBLocal.dump('log', 'log', tmp)
+        self._count[2] = 0
+        
+    
+    
 from core.config.base_config import json_config
 import logging
 
